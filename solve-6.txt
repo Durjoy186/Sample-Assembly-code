@@ -1,0 +1,31 @@
+.MODEL SMALL
+.STACK 100H
+.DATA
+.CODE
+MAIN PROC
+    MOV AH,1
+    INT 21H
+    MOV BL,AL
+    CMP BL,'a'
+    JB uc
+    SUB BL,32
+uc: ; BL is uppercase
+    MOV DL,'V'
+    CMP BL,'A'  ; A
+    JE pv
+    CMP BL,'E'
+    JE pv
+    CMP BL,'I'
+    JE pv
+    CMP BL,'O'
+    JE pv
+    CMP BL,'U'
+    JE pv
+    MOV DL,'C'
+pv:
+    MOV AH,2
+    INT 21H
+    MOV AH,4CH
+    INT 21H
+MAIN ENDP
+END MAIN

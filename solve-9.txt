@@ -1,0 +1,45 @@
+.MODEL SMALL
+.STACK 100H
+.DATA
+lbl DB 'Sum: $'
+.CODE
+MAIN PROC
+    MOV AX,@DATA
+    MOV DS,AX
+
+    MOV AH,1
+    INT 21H
+    SUB AL,'0'
+    MOV BL,AL
+
+    MOV AH,1
+    INT 21H
+    SUB AL,'0'
+    ADD BL,AL     ; BL=sum 0..18
+
+    ; print label
+    MOV AH,9
+    LEA DX,lbl
+    INT 21H
+
+    ; print decimal (two digits max)
+    XOR AX,AX
+    MOV AL,BL
+    MOV BL,10
+    DIV BL        ; AL=tens, AH=ones
+    CMP AL,0
+    JE P1
+    ADD AL,'0'
+    MOV DL,AL
+    MOV AH,2
+    INT 21H
+P1: MOV AL,AH
+    ADD AL,'0'
+    MOV DL,AL
+    MOV AH,2
+    INT 21H
+
+    MOV AH,4CH
+    INT 21H
+MAIN ENDP
+END MAIN

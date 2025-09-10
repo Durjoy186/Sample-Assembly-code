@@ -1,0 +1,61 @@
+.MODEL SMALL
+.STACK 100H
+.DATA
+txt DB 'Product: $'
+.CODE
+MAIN PROC
+    MOV AX,@DATA
+    MOV DS,AX
+
+    ; read a
+    MOV AH,1
+    INT 21H
+    SUB AL,'0'
+    MOV BL,AL     ; BL=a
+
+    ; read b
+    MOV AH,1
+    INT 21H
+    SUB AL,'0'
+    MOV CL,AL     ; CL=b
+
+    XOR BH,BH     ; BH:BL as 16-bit sum (keep simple, use BX as sum)
+    XOR BX,BX
+
+ML: TEST CL,CL
+    JZ PR
+    ADD BX,AX     ; need AX=a, so move BL to AL
+    ; fix: set AX from BL once
+PREREP:
+    MOV AL,BL
+    XOR AH,AH
+ML1:
+    ADD BX,AX
+    LOOP ML1
+
+PR: ; print label
+    MOV AH,9
+    LEA DX,txt
+    INT 21H
+
+    ; print BX (0..81) as two digits (handle 3 if >=100, not needed)
+    MOV AX,BX
+    MOV BL,10
+    DIV BL        ; AL=tens, AH=ones
+    CMP AL,0
+    JE OONLY
+    ADD AL,'0'
+    MOV DL,AL
+    MOV AH,2
+    INT 21H
+OONLY:
+    MOV AL,AH
+    ADD AL,'0'
+    MOV DL,AL
+    MOV AH,2
+    INT 21H
+
+    MOV AH,4CH
+    INT 21H
+MAIN ENDP
+END MAIN
